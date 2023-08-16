@@ -3,8 +3,14 @@ import { useGetUsersQuery } from "@/redux/services/api";
 import React from "react";
 
 export const UserContainer = ({ userId, ...props }) => {
-  const { data: users } = useGetUsersQuery();
-  const user = users?.find(user => user.id === userId);
+  const { data: user } = useGetUsersQuery(undefined, {
+    selectFromResult: (result) => {
+      return {
+        ...result,
+        data: result.data?.find(({ id }) => id === userId),
+      };
+    },
+  });
 
   if (!user) {
     return null;

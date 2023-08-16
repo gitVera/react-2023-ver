@@ -12,13 +12,6 @@ export const api = createApi({
       providesTags: (result) =>
         (result || []).map(({ id }) => ({ type: "Restaurant", id })),
     }),
-    getUsers: builder.query({
-      query: () => ({
-        url: "users",
-      }),
-      providesTags: (result) =>
-        (result || []).map(({ id }) => ({ type: "User", id })),
-    }),
     getDishes: builder.query({
       query: (restaurantId) => ({
         url: "dishes",
@@ -27,7 +20,18 @@ export const api = createApi({
         },
       }),
       providesTags: (result) =>
-        (result || []).map(({ id }) => ({ type: "Dish", id })),
+        (result || [])
+          .map(({ id }) => ({ type: "Dish", id }))
+          .concat({ type: "Dish", id: "LIST" }),
+    }),
+    getUsers: builder.query({
+      query: () => ({
+        url: "users",
+      }),
+      providesTags: (result) =>
+        (result || [])
+          .map(({ id }) => ({ type: "User", id }))
+          .concat({ type: "User", id: "LIST" }),
     }),
     getReviews: builder.query({
       query: (restaurantId) => ({
@@ -67,4 +71,6 @@ export const {
   useGetDishesQuery,
   useCreateReviewMutation,
   useUpdateReviewMutation,
+  useGetDishesQuery,
+  useGetUsersQuery,
 } = api;

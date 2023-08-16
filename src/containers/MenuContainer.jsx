@@ -1,19 +1,13 @@
 import { Menu } from "@/components/Menu/Menu";
-import { MenuSkeleton } from "@/components/Menu/MenuSkeleton";
-import { useGetDishesQuery } from "@/redux/services/api";
-import React, { useEffect } from "react";
+import { fetchDishes } from "@/services";
+import React from "react";
 
-export const MenuContainer = ({ restaurantId, className }) => {
-
-  const { data: dishes, isLoading, isFetching } = useGetDishesQuery(restaurantId);
-
-  if (isLoading || isFetching) {
-    return <MenuSkeleton />;
-  }
+export async function MenuContainer({ restaurantId, className }) {
+  const dishes = await fetchDishes(restaurantId);
 
   if (!dishes?.length) {
     return null;
   }
 
   return <Menu dishes={dishes} className={className} />;
-};
+}

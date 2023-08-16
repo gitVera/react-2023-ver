@@ -1,50 +1,16 @@
-/* eslint-disable react/jsx-key */
-import React, { useReducer, useState } from "react";
+import React, { useState } from "react";
+
+import styles from "./styles.module.scss";
 import classNames from "classnames";
 
 import { useGetUsersQuery, useUpdateReviewMutation } from "@/redux/services/api";
 
 import { Rating } from "@/components/Rating/Rating";
 import { UserContainer } from "@/containers/UserContainer";
-import { Button } from "../Button/Button";
-import styles from "./styles.module.scss";
-
+import { NewReviewFormContainer } from "@/containers/NewReviewFormContainer";
 
 export const Review = ({ review, className }) => {
-  const [updateReview, { isLoading, error }] = useUpdateReviewMutation();
-  const { data: users, isLoading: isUsersLoading } = useGetUsersQuery();
-  const [changeMode, setChangeMode] = useState(false);
-
-  const { text, userId, rating } = review;
-
-  const initialState = {
-    userId,
-    text,
-    rating,
-  };
-
-  const reducer = (state, { type, payload } = {}) => {
-    switch (type) {
-      case "changeUser": {
-        return { ...initialState, userId: payload };
-      }
-      case "changeText": {
-        return { ...state, text: payload };
-      }
-      case "changeRating": {
-        if (payload === "" || (Number(payload) <= 5 && Number(payload) >= 1)) {
-          return { ...state, rating: payload };
-        }
-      }
-      case "reset": {
-        return initialState;
-      }
-      default:
-        return state;
-    }
-  };
-
-  const [form, dispatch] = useReducer(reducer, initialState);
+  const [isEditMode, setIsEditMode] = useState(false);
 
   if (!review) {
     return null;
@@ -82,42 +48,18 @@ export const Review = ({ review, className }) => {
       
 
     <div className={classNames(styles.root, className)}>
-      <div className={styles.header}>
-        {!changeMode ? <UserContainer userId={userId} />
-        : (
-          <div>
-          <select
-            value={form.userId}
-            onChange={(event) => {
-              dispatch({ type: "changeUser", payload: event.target.value });
-            }}
-          >
-            <option>-</option>
-            {users.map(({ name, id }) => (
-              <option value={id}>{name}</option>
-            ))}
-          </select>
-        </div>
-        )}
-        {!changeMode ? <div>{rating}</div>
-        : (
-          <Rating
-            value={form.rating}
-            onChange={(value) =>
-              dispatch({ type: "changeRating", payload: value })
-            }
-          />
-        )}
-      </div>
-      {!changeMode ? <p>{text}</p>
-              : (<input
-              value={form.text}
-              onChange={(event) =>
-                dispatch({ type: "changeText", payload: event.target.value })
-              }
-            />)
-      }
+      <button onClick={() => setIsEditMode(!isEditMode)}>switchMode</button>
+      {!isEditMode ? (
+        <>
+          <div className={styles.header}>
+            <UserContainer userId={userId} />
+            <div>{rating}</div>
+          </div>
+          <p>{text}</p>
+        </>
+      ) : (
+        <NewReviewFormContainer review={review} />
+      )}
     </div>
-  </div>
   );
 };
